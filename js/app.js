@@ -18,9 +18,9 @@ const BOSS_SIZE = 5;
 
 // Default boss stats.
 const DEFAULT_BOSS = {
-  def: 185, magic: 205, hp: 2000, size: BOSS_SIZE,
-  stab: 100, slash: 100, crush: 55, mdef: 350, light: 257, standard: 215, heavy: 300,
-  severity: 116, defCap: 26, mdefCap: 32,
+  def: 143, magic: 184, hp: 2000, size: BOSS_SIZE,
+  stab: 100, slash: 100, crush: 72, mdef: 298, light: 294, standard: 231, heavy: 219,
+  severity: 113, defCap: 28, mdefCap: 35,
 };
 
 const STAT_GROUPS = [
