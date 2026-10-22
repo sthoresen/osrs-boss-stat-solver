@@ -1,5 +1,9 @@
 # Boss Stat Solver
 
+**▶ Try it: [sthoresen.github.io/osrs-boss-stat-solver](https://sthoresen.github.io/osrs-boss-stat-solver/)**
+
+[![Boss Stat Solver: DPS per setup with nudge arrows, and the boss stats panel](docs/screenshot.png)](https://sthoresen.github.io/osrs-boss-stat-solver/)
+
 Nudge OSRS gear setups up or down (±5% DPS per click), press Solve, and the solver finds the boss
 stats (defence level, magic level, defence bonuses, elemental weakness, defence-drain caps) that make
 those setups do more or less damage while keeping the rest where they are.
