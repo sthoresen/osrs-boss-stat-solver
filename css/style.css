@@ -141,7 +141,7 @@ select, input[type="number"] {
 .lg-sep { width: 1px; height: 14px; background: var(--border); }
 
 .chart-scroll { overflow-x: auto; overflow-y: hidden; margin: 0 -8px; padding: 0 8px; }
-#chart { display: block; touch-action: pan-x; }
+#chart { display: block; }
 #chart text { font-family: var(--font); }
 .axis-text { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
 .axis-title { fill: var(--text-2); font-size: 12px; }
@@ -269,3 +269,85 @@ th { color: var(--text-2); font-weight: 600; }
 .preset-note:empty { display: none; }
 .stats-card #mode { width: 100%; margin-top: 4px; }
 .ov-title .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+/* change badges after a solve */
+.stat-row { position: relative; }
+.delta {
+  position: absolute; right: 104px; top: 50%;
+  padding: 1px 7px; border-radius: 999px;
+  font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.5;
+  color: #fff; pointer-events: none; white-space: nowrap;
+  animation: delta-pop 2.8s ease-out forwards;
+}
+.delta.up { background: var(--good); }
+.delta.down { background: var(--bad); }
+@keyframes delta-pop {
+  0% { opacity: 0; transform: translateY(-50%) scale(0.7); }
+  8% { opacity: 1; transform: translateY(-50%) scale(1.08); }
+  14% { transform: translateY(-50%) scale(1); }
+  70% { opacity: 1; transform: translateY(-50%); }
+  100% { opacity: 0; transform: translateY(-110%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .delta { animation: delta-fade 2.8s linear forwards; transform: translateY(-50%); }
+  @keyframes delta-fade { 0%, 70% { opacity: 1; } 100% { opacity: 0; } }
+}
+.home { color: inherit; text-decoration: none; }
+.home:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+
+/* narrow screens: the chart is a list of rows instead of columns */
+.chart-card.rows-mode .chart-scroll { display: none; }
+.chart-card:not(.rows-mode) .rows { display: none; }
+.rows { margin-top: 4px; }
+.row-group {
+  display: flex; align-items: center; gap: 6px; margin: 12px 0 2px;
+  font-size: 12px; font-weight: 600; color: var(--text-2);
+}
+.row-group:first-child { margin-top: 4px; }
+.row-group .dot { width: 9px; height: 9px; border-radius: 50%; }
+.row {
+  display: grid; grid-template-columns: 96px minmax(0, 1fr) 40px 36px; gap: 8px; align-items: center;
+  padding: 4px 4px 4px 2px; border-radius: 8px;
+}
+.row.pending { background: var(--pending-wash); }
+.row.active { background: var(--surface-2); }
+.row-main {
+  display: flex; align-items: center; gap: 6px; min-width: 0; padding: 4px 2px;
+  border: 0; background: none; color: var(--text); font: inherit; font-size: 12.5px; line-height: 1.2;
+  text-align: left; cursor: pointer;
+}
+.row-main img { width: 26px; height: 26px; object-fit: contain; flex: none; }
+.row-track { position: relative; height: 18px; background: var(--surface-2); border-radius: 0 4px 4px 0; }
+.row-track i { position: absolute; top: 0; bottom: 0; display: block; }
+.row-bar { left: 0; border-radius: 0 4px 4px 0; }
+.row-wash { opacity: 0.3; border-radius: 0 4px 4px 0; }
+.row-req { width: 4px; top: -4px !important; bottom: -4px !important; margin-left: -2px; border-radius: 2px; background: var(--pending); box-shadow: 0 0 0 1.5px var(--surface); }
+.row-val { font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; line-height: 1.2; color: var(--text-2); }
+.row-pct, .row-got { display: block; font-size: 11px; }
+.row-pct { color: var(--text); }
+.row-arrows { display: flex; flex-direction: column; gap: 4px; }
+.rarrow {
+  width: 36px; height: 24px; border-radius: 6px; background: var(--surface); border: 1.5px solid;
+  display: grid; place-items: center; padding: 0; cursor: pointer;
+}
+.rarrow svg { width: 12px; height: 8px; }
+.rarrow.up { border-color: var(--good); fill: var(--good); }
+.rarrow.down { border-color: var(--bad); fill: var(--bad); }
+.rarrow:disabled { opacity: 0.35; cursor: default; }
+@media (hover: hover) {
+  .rarrow.up:hover:not(:disabled) { background: var(--good); fill: var(--surface); }
+  .rarrow.down:hover:not(:disabled) { background: var(--bad); fill: var(--surface); }
+}
+.rarrow:active:not(:disabled) { transform: scale(0.94); }
+
+/* tapped gear popup: a closable sheet at the bottom of the screen */
+.ov-close {
+  margin-left: auto; flex: none; width: 32px; height: 32px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  font-size: 15px; line-height: 1; cursor: pointer;
+}
+.overlay.sheet {
+  left: 8px; right: 8px; bottom: 8px; top: auto; width: auto; max-width: none;
+  max-height: 75vh; overflow-y: auto; pointer-events: auto;
+}
+.overlay.sheet .ov-stats { gap: 2px 8px; }

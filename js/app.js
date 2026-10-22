@@ -165,7 +165,61 @@ function arrowButton(id, dir, x, y, disabled) {
     + `<rect x="${x - 15}" y="${y - 10}" width="30" height="20" rx="5"/><path d="${tri}"/></g>`;
 }
 
+// Below this chart-card width the chart becomes a vertical list of rows (no sideways scrolling on phones).
+const ROWS_BREAKPOINT = 640;
+
 function renderChart() {
+  const card = $('.chart-card');
+  const rows = card.clientWidth < ROWS_BREAKPOINT;
+  card.classList.toggle('rows-mode', rows);
+  if (rows) renderRows(); else renderColumns();
+}
+
+function rowArrow(id, dir, disabled) {
+  const up = dir > 0;
+  const label = `${up ? 'More' : 'Less'} DPS for ${BY_ID[id].short}`;
+  return `<button class="rarrow ${up ? 'up' : 'down'}" data-id="${id}" data-dir="${dir}" aria-label="${esc(label)}"${disabled ? ' disabled' : ''}>`
+    + `<svg viewBox="0 0 12 8" aria-hidden="true"><path d="${up ? 'M1 7 L6 1 L11 7Z' : 'M1 1 L6 7 L11 1Z'}"/></svg></button>`;
+}
+
+function renderRows() {
+  const ymax = chartMax();
+  const at = (v) => Math.min(100, (v / ymax) * 100);
+  let html = '';
+  let prevGroup = null;
+  for (const s of enabledSetups()) {
+    if (s.group !== prevGroup) {
+      html += `<div class="row-group"><span class="dot ${s.group}"></span>${GROUP_NAME[s.group]}</div>`;
+      prevGroup = s.group;
+    }
+    const row = report.rows[s.id];
+    const clicks = state.nudges[s.id] || 0;
+    const base = row.base.dps;
+    const red = row.red.dps;
+    const color = `var(--${s.group})`;
+    let mark = '';
+    let label = '';
+    if (clicks) {
+      mark = `<i class="row-req" style="left:${at(base * factor(clicks)).toFixed(2)}%"></i>`;
+      label = `<b class="row-pct">${signedPct(factor(clicks) - 1)}</b>`;
+    } else if (state.lastResult && state.status === 'solved') {
+      const r = state.lastResult.find((x) => x.id === s.id && x.asked !== 0);
+      if (r) label = `<span class="row-got">${signedPct(r.got)}</span>`;
+    }
+    const wash = at(red) - at(base) > 1
+      ? `<i class="row-wash" style="left:calc(${at(base).toFixed(2)}% + 2px);width:calc(${(at(red) - at(base)).toFixed(2)}% - 2px);background:${color}"></i>`
+      : '';
+    html += `<div class="row${clicks ? ' pending' : ''}${overlayId === s.id ? ' active' : ''}" data-id="${s.id}">
+      <button class="row-main" data-id="${s.id}" aria-label="Show gear for ${esc(s.name)}"><img src="${img(row.L.items.weapon.img)}" alt=""><span>${esc(s.short)}</span></button>
+      <div class="row-track"><i class="row-bar" style="width:${at(base).toFixed(2)}%;background:${color}"></i>${wash}${mark}</div>
+      <div class="row-val">${fmt(base, 1)}${label}</div>
+      <div class="row-arrows">${rowArrow(s.id, 1, clicks >= MAX_CLICKS)}${rowArrow(s.id, -1, clicks <= -MAX_CLICKS)}</div>
+    </div>`;
+  }
+  $('#rows').innerHTML = html;
+}
+
+function renderColumns() {
   const svg = $('#chart');
   const ymax = chartMax();
   const { cols, width } = layoutColumns();
@@ -242,22 +296,45 @@ function initChartEvents() {
     if (!a.classList.contains('disabled')) nudge(a.dataset.id, Number(a.dataset.dir));
     $(`#chart .arrow[data-id="${a.dataset.id}"][data-dir="${a.dataset.dir}"]`)?.focus({ preventScroll: true });
   };
+  let lastPointer = 'mouse';
+  document.addEventListener('pointerdown', (e) => { lastPointer = e.pointerType; }, true);
+  const toggleOverlay = (id, e) => {
+    if (overlayId === id && overlayPinned) hideOverlay(true);
+    else showOverlay(id, e, true);
+  };
   svg.addEventListener('click', (e) => {
     const a = e.target.closest('.arrow');
-    if (a) press(a);
+    if (a) { press(a); return; }
+    // touch: tap a column to open its gear (a click never fires after a scroll gesture)
+    const col = e.target.closest('.col');
+    if (col && lastPointer !== 'mouse') toggleOverlay(col.dataset.id, e);
+  });
+  $('#rows').addEventListener('click', (e) => {
+    const a = e.target.closest('.rarrow');
+    if (a) {
+      nudge(a.dataset.id, Number(a.dataset.dir));
+      $(`#rows .rarrow[data-id="${a.dataset.id}"][data-dir="${a.dataset.dir}"]`)?.focus({ preventScroll: true });
+      return;
+    }
+    const m = e.target.closest('.row-main');
+    if (m) toggleOverlay(m.dataset.id, e);
+  });
+  $('#overlay').addEventListener('click', (e) => {
+    if (e.target.closest('.ov-close')) hideOverlay(true);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && overlayId) hideOverlay(true);
+  });
+  let resizeTimer = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderChart, 120);
   });
   svg.addEventListener('keydown', (e) => {
     const a = e.target.closest('.arrow');
     if (a && (e.key === 'Enter' || e.key === ' ')) {
       e.preventDefault();
       press(a);
-    }
-  });
-  svg.addEventListener('pointerdown', (e) => {
-    const col = e.target.closest('.col');
-    if (col && e.pointerType !== 'mouse') {
-      if (overlayId === col.dataset.id && overlayPinned) hideOverlay(true);
-      else showOverlay(col.dataset.id, e, true);
     }
   });
   svg.addEventListener('pointermove', (e) => {
@@ -274,7 +351,7 @@ function initChartEvents() {
     if (!to) hideOverlay();
   });
   document.addEventListener('pointerdown', (e) => {
-    if (overlayPinned && !e.target.closest('#chart') && !e.target.closest('#overlay')) hideOverlay(true);
+    if (overlayPinned && !e.target.closest('#chart .col, .row-main, #overlay')) hideOverlay(true);
   });
 }
 
@@ -322,7 +399,8 @@ function overlayHtml(id) {
     ? `Drained: magic def bonus ${state.boss.mdef} → ${report.drainedBoss.mdef} (Eye of Ayak spec)`
     : `Drained: Defence ${state.boss.def} → ${report.drainedBoss.def}`;
   const clicks = state.nudges[id] || 0;
-  return `<div class="ov-title"><span class="dot ${s.group}"></span>${esc(s.name)}</div>
+  const close = overlayPinned ? '<button class="ov-close" aria-label="Close">✕</button>' : '';
+  return `<div class="ov-title"><span class="dot ${s.group}"></span>${esc(s.name)}${close}</div>
   <div class="ov-body">
     <div class="inv">${grid}</div>
     <dl class="ov-stats">
@@ -347,8 +425,17 @@ function showOverlay(id, e, pinned) {
   ov.innerHTML = overlayHtml(id);
   ov.hidden = false;
   ov.classList.toggle('pinned', pinned);
-  positionOverlay(e);
+  // on phones a tapped setup opens as a sheet along the bottom of the screen
+  const sheet = pinned && window.innerWidth < 700;
+  ov.classList.toggle('sheet', sheet);
+  if (sheet) {
+    ov.style.left = '';
+    ov.style.top = '';
+  } else {
+    positionOverlay(e);
+  }
   document.querySelectorAll('#chart .col-hit').forEach((r) => r.classList.toggle('active', r.parentNode.dataset.id === id));
+  document.querySelectorAll('#rows .row').forEach((r) => r.classList.toggle('active', r.dataset.id === id));
 }
 
 function positionOverlay(e) {
@@ -371,7 +458,7 @@ function hideOverlay(force) {
   overlayId = null;
   overlayPinned = false;
   $('#overlay').hidden = true;
-  document.querySelectorAll('#chart .col-hit.active').forEach((r) => r.classList.remove('active'));
+  document.querySelectorAll('#chart .col-hit.active, #rows .row.active').forEach((r) => r.classList.remove('active'));
 }
 
 // ---------- status ----------
@@ -383,7 +470,7 @@ function resultText() {
   const asked = state.lastResult.filter((r) => r.asked !== 0);
   if (!asked.length) return '';
   const close = asked.filter((r) => Math.abs(r.got - r.asked) <= Math.max(0.02, Math.abs(r.asked) * 0.3)).length;
-  return `${close} of ${asked.length} requested change${asked.length > 1 ? 's' : ''} landed close to what you asked. The % over a bar is how much it actually moved.`;
+  return `${close} of ${asked.length} requested change${asked.length > 1 ? 's' : ''} landed close to what you asked. The % by each bar is how much it actually moved.`;
 }
 
 function renderStatus() {
@@ -399,10 +486,10 @@ function renderStatus() {
     html = `${ICON_PENDING}<span><b>${n} change${n > 1 ? 's' : ''} pending.</b> Press Solve to find boss stats for them.</span>`;
   } else if (state.status === 'edited') {
     cls = 'edited';
-    html = `${ICON_EDIT}<span><b>Showing edited stats.</b> Use the arrows under each setup to ask for more or less DPS.</span>`;
+    html = `${ICON_EDIT}<span><b>Showing edited stats.</b> Use the arrows on each setup to ask for more or less DPS.</span>`;
   } else {
     cls = 'solved';
-    html = `${ICON_CHECK}<span><b>Solved.</b> ${state.lastResult ? resultText() : 'Use the arrows under each setup to ask for more or less DPS.'}</span>`;
+    html = `${ICON_CHECK}<span><b>Solved.</b> ${state.lastResult ? resultText() : 'Use the arrows on each setup to ask for more or less DPS.'}</span>`;
   }
   el.className = `status ${cls}`;
   el.innerHTML = html;
@@ -545,6 +632,7 @@ async function runSolve() {
   if (ctl.signal.aborted || !best) return;
 
   pushHistory();
+  const prevBoss = state.boss;
   state.boss = { ...state.boss, ...best.boss };
   report = computeReport();
   state.lastResult = setups.map((s) => ({
@@ -557,6 +645,36 @@ async function runSolve() {
   $('#bossPreset').value = '';
   $('#presetNote').textContent = '';
   renderAll();
+  flashDeltas(prevBoss, state.boss);
+}
+
+// badges start their fade only once they are on screen (on phones the stats panel is below the chart)
+const deltaObserver = new IntersectionObserver((entries) => {
+  for (const en of entries) {
+    if (en.isIntersecting) {
+      en.target.style.animationPlayState = 'running';
+      deltaObserver.unobserve(en.target);
+    }
+  }
+}, { threshold: 0.6 });
+
+/** After a solve, pop a fading +x / −x badge next to every stat that changed. */
+function flashDeltas(prev, next) {
+  document.querySelectorAll('#stats .delta').forEach((el) => el.remove());
+  for (const r of STAT_ROWS) {
+    const d = next[r.key] - prev[r.key];
+    if (!d) continue;
+    const row = document.querySelector(`#stats .stat-row[data-row="${r.key}"]`);
+    if (!row) continue;
+    const el = document.createElement('span');
+    el.className = `delta ${d > 0 ? 'up' : 'down'}`;
+    el.textContent = `${d > 0 ? '+' : '−'}${Math.abs(d)}${r.unit || ''}`;
+    el.setAttribute('aria-hidden', 'true');
+    el.addEventListener('animationend', () => el.remove());
+    el.style.animationPlayState = 'paused';
+    row.appendChild(el);
+    deltaObserver.observe(el);
+  }
 }
 
 // ---------- share state ----------
@@ -628,7 +746,9 @@ function init() {
     }
     setTimeout(() => { btn.textContent = 'Copy share link'; }, 1800);
   });
-  window.addEventListener('scroll', () => hideOverlay(true), { passive: true });
+  window.addEventListener('scroll', () => {
+    if (!$('#overlay').classList.contains('sheet')) hideOverlay(true);
+  }, { passive: true });
 
   initChartEvents();
   renderAll();

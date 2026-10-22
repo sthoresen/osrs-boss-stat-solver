@@ -12,7 +12,7 @@
 <header class="top">
   <div class="wrap top-row">
     <div>
-      <h1>Boss Stat Solver</h1>
+      <h1><a class="home" href="./" title="Start over with the default boss">Boss Stat Solver</a></h1>
       <p class="lede">Find the stats to support the meta you want.</p>
     </div>
     <button id="share" class="btn">Copy share link</button>
@@ -24,7 +24,7 @@
     <section class="card chart-card" aria-label="DPS per setup">
       <div class="chart-head">
         <h2>DPS per setup</h2>
-        <p class="sub">Use ▲ ▼ under a setup to ask for 5% more or less DPS per click, then press Solve. Hover a setup to see its gear.</p>
+        <p class="sub">Use ▲ ▼ on a setup to ask for 5% more or less DPS per click, then press Solve. Hover or tap a setup to see its gear.</p>
       </div>
 
       <div class="solvebar">
@@ -47,6 +47,7 @@
         <span><i class="lg-req"></i>Requested DPS (pending)</span>
       </div>
       <div class="chart-scroll"><svg id="chart" role="img" aria-label="DPS per setup"></svg></div>
+      <div id="rows" class="rows" aria-label="DPS per setup"></div>
 
       <div class="setups" aria-label="Setups shown">
         <span class="setups-label">Show</span>

@@ -55,4 +55,8 @@ Formulas are ported from the [OSRS Wiki DPS calculator](https://github.com/weird
 item data and icons come from it and from the [OSRS Wiki](https://oldschool.runescape.wiki/). That calculator
 is GPL-3.0, so this project is GPL-3.0 too (see `LICENSE`). Not affiliated with Jagex.
 
-100% Vibe-coded
+## How this was made
+
+This project is 100% vibe coded. But I did verify that the numbers are correct :)
+
+The wiki was only queried once, while building it. Visitors never poll the wiki: All the data the page needs is already stored in this repo.
