@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boss Stat Solver</title>
+<meta name="description" content="Say which OSRS setups should do more or less damage, and solve for boss defence stats that make it happen.">
+<link rel="icon" href="img/items/twisted-bow.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-row">
+    <div>
+      <h1>Boss Stat Solver</h1>
+      <p class="lede">Find the stats to support the meta you want.</p>
+    </div>
+    <button id="share" class="btn">Copy share link</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="layout">
+    <section class="card chart-card" aria-label="DPS per setup">
+      <div class="chart-head">
+        <h2>DPS per setup</h2>
+        <p class="sub">Use ▲ ▼ under a setup to ask for 5% more or less DPS per click, then press Solve. Hover a setup to see its gear.</p>
+      </div>
+
+      <div class="solvebar">
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+        <div class="solvebar-actions">
+          <button id="undo" class="btn" hidden>Undo</button>
+          <button id="clear" class="btn" hidden>Clear changes</button>
+          <button id="solve" class="btn primary">Solve</button>
+        </div>
+        <div id="progress" class="progress" hidden><i></i></div>
+      </div>
+
+      <div class="legend" aria-hidden="true">
+        <span><i class="lg-dot melee"></i>Melee</span>
+        <span><i class="lg-dot ranged"></i>Ranged</span>
+        <span><i class="lg-dot magic"></i>Magic</span>
+        <span class="lg-sep"></span>
+        <span><i class="lg-bar"></i>DPS</span>
+        <span><i class="lg-bar wash"></i>Extra DPS after defence drain</span>
+        <span><i class="lg-req"></i>Requested DPS (pending)</span>
+      </div>
+      <div class="chart-scroll"><svg id="chart" role="img" aria-label="DPS per setup"></svg></div>
+
+      <div class="setups" aria-label="Setups shown">
+        <span class="setups-label">Show</span>
+        <div id="chips" class="chips"></div>
+      </div>
+    </section>
+
+    <aside class="card stats-card" aria-label="Boss stats">
+      <div class="stats-head">
+        <h2>Boss stats</h2>
+        <select id="bossPreset" aria-label="Load a real boss"><option value="">Load a real boss…</option></select>
+      </div>
+      <p id="presetNote" class="sub preset-note"></p>
+      <p class="sub">Edit a stat to see its effect right away. The solver only changes unlocked stats.</p>
+      <div id="stats"></div>
+      <div class="stat-group">
+        <h3>Drained bars show</h3>
+        <select id="mode" aria-label="Drained bars show">
+          <option value="cap">Defence drained to the cap</option>
+          <option value="dwh2">2 DWH specs (limited by cap)</option>
+          <option value="dwh1">1 DWH spec (limited by cap)</option>
+        </select>
+      </div>
+    </aside>
+  </div>
+
+  <section class="card">
+    <details>
+      <summary><h2>Numbers</h2></summary>
+      <div class="table-scroll"><table id="table"></table></div>
+    </details>
+  </section>
+
+  <section class="card about">
+    <h2>How it works</h2>
+    <div class="cols">
+      <div>
+        <h3>The DPS maths</h3>
+        <p>Every number uses the formulas of the <a href="https://tools.runescape.wiki/osrs-dps/">OSRS Wiki DPS calculator</a> (<a href="https://github.com/weirdgloop/osrs-dps-calc">source</a>), ported to a small engine fast enough to test thousands of bosses per second. It was checked against the real calculator on 300 random bosses × 13 setups, including drained bosses, and the results matched exactly.</p>
+        <p>Player: 99 in all combat stats with a super combat, a ranging potion and a saturated heart, plus Piety, Rigour or Augury. Item stats and icons come from the same calculator.</p>
+        <p>Item effects that are modelled include the Twisted bow's magic-level scaling (capped at 250), the Scythe's three hits (the boss is always assumed to be large), the Inquisitor set bonus, crystal armour with the Bowfa, ruby bolt procs, Twinflame's second hit and smoke-staff bonus, Shadow's ×3 gear bonus, Confliction gauntlets, tomes, and elemental weakness.</p>
+      </div>
+      <div>
+        <h3>Defence drain</h3>
+        <p>Each setup gets two values: one at full defence, and one at the lowest defence the boss allows. <b>Defence drain cap</b> is how much of its Defence level the boss can lose, like the defence floors on Nex (250) or Yama (145). DWH, elder maul, BGS and Ralos specs all stop at this floor. Drain helps melee and ranged only, because a boss's magic defence uses its Magic level.</p>
+        <p>The magic equivalent is the <b>Eye of Ayak</b> special attack, which drains the boss's magic defence <i>bonus</i>. <b>Magic def drain cap</b> limits how much of that bonus it can remove.</p>
+        <p>Elemental weakness has no type here: the weakness % applies to the elemental setups (Harmonised staff and Twinflame), which cast fire spells with a Tome of Fire. Since the elemental rework all surges hit 24 and all waves hit 20 at this Magic level, so the element makes no difference to max hit.</p>
+      </div>
+      <div>
+        <h3>The solver</h3>
+        <p>When you press Solve, each setup you nudged aims for its current DPS ±5% per click, and every other setup aims to stay where it is. The solver minimises the squared log-error against those aims, so being 10% off counts the same for a 5 DPS setup as for a 10 DPS one. It uses differential evolution and then a fine integer search, with a weak pull toward the current stats.</p>
+        <p>Some requests can't all be met at once. Bludgeon, Inq mace and Scythe crush all attack crush defence, so the boss can't favour one over another, and only their gear separates them. Magic level also does two jobs: it sets the magic defence roll and it scales the Twisted bow.</p>
+        <p>Not modelled: special attack damage, prayer drain, thralls, ruby bolts weakening as the boss loses HP, and boss attributes (demon, dragon, undead).</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <p>Not affiliated with Jagex. Item data and icons from the <a href="https://oldschool.runescape.wiki/">OSRS Wiki</a> and the <a href="https://github.com/weirdgloop/osrs-dps-calc">wiki DPS calculator</a> (GPL-3.0).</p>
+</footer>
+
+<div id="overlay" class="overlay" role="tooltip" hidden></div>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

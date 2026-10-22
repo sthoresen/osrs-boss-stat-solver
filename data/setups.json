@@ -1,0 +1,279 @@
+{
+  "_readme": [
+    "Hand-edited setup list. The page loads this file at runtime.",
+    "Items are 'Name' or 'Name|Version' exactly as in the OSRS wiki DPS calc equipment.json.",
+    "After adding an item that no setup used before, run: python3 tools/build_data.py <path to osrs-dps-calc>",
+    "group: melee | ranged | magic. style: Accurate (powered staff), Autocast, Pound, Pummel, Jab (scythe crush), Rapid.",
+    "spell: the autocast spell (elemental setups). dart: blowpipe dart."
+  ],
+  "player": {
+    "levels": {
+      "atk": 99,
+      "str": 99,
+      "ranged": 99,
+      "magic": 99,
+      "hp": 99
+    },
+    "boosts": {
+      "atk": 19,
+      "str": 19,
+      "ranged": 13,
+      "magic": 13
+    },
+    "boostNote": "Super combat (+19), ranging potion (+13), saturated heart (+13)",
+    "prayers": {
+      "melee": "PIETY",
+      "ranged": "RIGOUR",
+      "magic": "AUGURY"
+    },
+    "kandarinDiary": true
+  },
+  "setups": [
+    {
+      "id": "ayak_max",
+      "name": "Eye of Ayak (max)",
+      "short": "Ayak max",
+      "group": "magic",
+      "style": "Accurate",
+      "items": {
+        "weapon": "Eye of Ayak|Charged",
+        "head": "Ancestral hat",
+        "body": "Ancestral robe top",
+        "legs": "Ancestral robe bottom",
+        "neck": "Occult necklace",
+        "cape": "Imbued Zamorak cape|Normal",
+        "hands": "Confliction gauntlets",
+        "feet": "Avernic treads (max)",
+        "ring": "Magus ring",
+        "shield": "Elidinis' ward (f)"
+      }
+    },
+    {
+      "id": "ayak_mid",
+      "name": "Eye of Ayak (moons gear)",
+      "short": "Ayak moons",
+      "group": "magic",
+      "style": "Accurate",
+      "items": {
+        "weapon": "Eye of Ayak|Charged",
+        "head": "Blue moon helm|New",
+        "body": "Blue moon chestplate|New",
+        "legs": "Blue moon tassets|New",
+        "neck": "Occult necklace",
+        "cape": "Imbued Zamorak cape|Normal",
+        "hands": "Tormented bracelet",
+        "feet": "Eternal boots",
+        "ring": "Seers ring (i)",
+        "shield": "Mage's book"
+      }
+    },
+    {
+      "id": "harm_max",
+      "name": "Harmonised staff, fire surge (max)",
+      "short": "Harm surge",
+      "group": "magic",
+      "style": "Autocast",
+      "spell": "Fire Surge",
+      "items": {
+        "weapon": "Harmonised Nightmare staff",
+        "head": "Ancestral hat",
+        "body": "Ancestral robe top",
+        "legs": "Ancestral robe bottom",
+        "neck": "Occult necklace",
+        "cape": "Imbued Zamorak cape|Normal",
+        "hands": "Confliction gauntlets",
+        "feet": "Avernic treads (max)",
+        "ring": "Magus ring",
+        "shield": "Tome of Fire|Charged"
+      }
+    },
+    {
+      "id": "twinflame_mid",
+      "name": "Twinflame staff, fire wave (blue moon)",
+      "short": "Twinflame",
+      "group": "magic",
+      "style": "Autocast",
+      "spell": "Fire Wave",
+      "items": {
+        "weapon": "Twinflame staff",
+        "head": "Blue moon helm|New",
+        "body": "Blue moon chestplate|New",
+        "legs": "Blue moon tassets|New",
+        "neck": "Occult necklace",
+        "cape": "Imbued Zamorak cape|Normal",
+        "hands": "Tormented bracelet",
+        "feet": "Eternal boots",
+        "ring": "Seers ring (i)",
+        "shield": "Tome of Fire|Charged"
+      }
+    },
+    {
+      "id": "shadow_max",
+      "name": "Tumeken's shadow (max)",
+      "short": "Shadow",
+      "group": "magic",
+      "style": "Accurate",
+      "items": {
+        "weapon": "Tumeken's shadow|Charged",
+        "head": "Ancestral hat",
+        "body": "Ancestral robe top",
+        "legs": "Ancestral robe bottom",
+        "neck": "Occult necklace",
+        "cape": "Imbued Zamorak cape|Normal",
+        "hands": "Confliction gauntlets",
+        "feet": "Avernic treads (max)",
+        "ring": "Magus ring"
+      }
+    },
+    {
+      "id": "bludgeon_mid",
+      "name": "Abyssal bludgeon (mid gear)",
+      "short": "Bludgeon",
+      "group": "melee",
+      "style": "Pound",
+      "items": {
+        "weapon": "Abyssal bludgeon",
+        "head": "Neitiznot faceguard",
+        "body": "Bandos chestplate",
+        "legs": "Bandos tassets",
+        "neck": "Amulet of torture",
+        "cape": "Fire cape|Normal",
+        "hands": "Barrows gloves",
+        "feet": "Dragon boots",
+        "ring": "Berserker ring (i)"
+      }
+    },
+    {
+      "id": "inq_max",
+      "name": "Inquisitor's mace (max)",
+      "short": "Inq mace",
+      "group": "melee",
+      "style": "Pummel",
+      "items": {
+        "weapon": "Inquisitor's mace",
+        "head": "Inquisitor's great helm",
+        "body": "Inquisitor's hauberk",
+        "legs": "Inquisitor's plateskirt",
+        "neck": "Amulet of rancour",
+        "cape": "Infernal cape|Normal",
+        "hands": "Ferocious gloves",
+        "feet": "Avernic treads (max)",
+        "ring": "Ultor ring",
+        "shield": "Avernic defender|Normal"
+      }
+    },
+    {
+      "id": "scythe_crush",
+      "name": "Scythe of vitur, crush (torva)",
+      "short": "Scythe crush",
+      "group": "melee",
+      "style": "Jab",
+      "items": {
+        "weapon": "Scythe of Vitur|Charged",
+        "head": "Torva full helm|Restored",
+        "body": "Torva platebody|Restored",
+        "legs": "Torva platelegs|Restored",
+        "neck": "Amulet of rancour",
+        "cape": "Infernal cape|Normal",
+        "hands": "Ferocious gloves",
+        "feet": "Avernic treads (max)",
+        "ring": "Ultor ring"
+      }
+    },
+    {
+      "id": "tbow_max",
+      "name": "Twisted bow (max)",
+      "short": "Tbow",
+      "group": "ranged",
+      "style": "Rapid",
+      "items": {
+        "weapon": "Twisted bow",
+        "ammo": "Seeking dragon arrow",
+        "head": "Masori mask (f)",
+        "body": "Masori body (f)",
+        "legs": "Masori chaps (f)",
+        "neck": "Necklace of rupture",
+        "cape": "Dizana's quiver|Charged",
+        "hands": "Zaryte vambraces",
+        "feet": "Avernic treads (max)",
+        "ring": "Venator ring"
+      }
+    },
+    {
+      "id": "bowfa_mid",
+      "name": "Bow of faerdhinen (crystal armour)",
+      "short": "Bowfa",
+      "group": "ranged",
+      "style": "Rapid",
+      "items": {
+        "weapon": "Bow of Faerdhinen|Charged",
+        "head": "Crystal helm|Active",
+        "body": "Crystal body|Active",
+        "legs": "Crystal legs|Active",
+        "neck": "Necklace of anguish",
+        "cape": "Ava's assembler|Normal",
+        "hands": "Barrows gloves",
+        "feet": "Pegasian boots",
+        "ring": "Archers ring (i)"
+      }
+    },
+    {
+      "id": "acb_mid",
+      "name": "Armadyl crossbow, ruby bolts (mid gear)",
+      "short": "ACB rubies",
+      "group": "ranged",
+      "style": "Rapid",
+      "items": {
+        "weapon": "Armadyl crossbow",
+        "ammo": "Ruby dragon bolts (e)",
+        "head": "Armadyl helmet",
+        "body": "Armadyl chestplate",
+        "legs": "Armadyl chainskirt",
+        "neck": "Necklace of anguish",
+        "cape": "Ava's assembler|Normal",
+        "hands": "Barrows gloves",
+        "feet": "Armadyl d'hide boots",
+        "ring": "Archers ring (i)",
+        "shield": "Twisted buckler"
+      }
+    },
+    {
+      "id": "bp_mid",
+      "name": "Blowpipe, amethyst darts (eclipse moon)",
+      "short": "BP mid",
+      "group": "ranged",
+      "style": "Rapid",
+      "dart": "Amethyst dart|Unpoisoned",
+      "items": {
+        "weapon": "Toxic blowpipe|Charged",
+        "head": "Eclipse moon helm|New",
+        "body": "Eclipse moon chestplate|New",
+        "legs": "Eclipse moon tassets|New",
+        "neck": "Necklace of anguish",
+        "cape": "Ava's assembler|Normal",
+        "hands": "Barrows gloves",
+        "feet": "Armadyl d'hide boots",
+        "ring": "Archers ring (i)"
+      }
+    },
+    {
+      "id": "bp_max",
+      "name": "Blowpipe, dragon darts (masori)",
+      "short": "BP max",
+      "group": "ranged",
+      "style": "Rapid",
+      "dart": "Dragon dart|Unpoisoned",
+      "items": {
+        "weapon": "Toxic blowpipe|Charged",
+        "head": "Masori mask (f)",
+        "body": "Masori body (f)",
+        "legs": "Masori chaps (f)",
+        "neck": "Necklace of rupture",
+        "cape": "Dizana's quiver|Charged",
+        "hands": "Zaryte vambraces",
+        "feet": "Avernic treads (max)",
+        "ring": "Venator ring"
+      }
+    }
+  ]
+}
